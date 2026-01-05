@@ -1,6 +1,7 @@
 # n8n-automation-workflows-collection
 
 📌 Workflows Included
+
 🤖 AI Mentor Chatbot (Telegram)
 
 Description:
@@ -18,6 +19,8 @@ Beginner-friendly, step-by-step explanations
 
 Use Cases:
 AI teaching assistant, student doubt-solving bot, guided learning mentor
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 🎓 Certificate Eligibility & Email Automation
 
