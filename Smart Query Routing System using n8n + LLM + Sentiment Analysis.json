@@ -1,0 +1,152 @@
+{
+  "name": "Smart Query Routing System using n8n + LLM + Sentiment Analysis",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1jl5JjFtEaHFpZ4fgMzgcvyoZXM-sj51Xg5pYx_MquKc",
+          "mode": "list",
+          "cachedResultName": "FeedBack Form (Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jl5JjFtEaHFpZ4fgMzgcvyoZXM-sj51Xg5pYx_MquKc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 266254163,
+          "mode": "list",
+          "cachedResultName": "Form responses 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jl5JjFtEaHFpZ4fgMzgcvyoZXM-sj51Xg5pYx_MquKc/edit#gid=266254163"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        0
+      ],
+      "id": "5f0d736d-65b7-46f6-9050-2533e3de252b",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "IsN4EGWWSidpqPHq",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=generate a mail according to this feedback {{ $json['Review (1-5)'] }} given by the user from batch num {{ $json['Batch number'] }} ",
+        "options": {
+          "systemMessage": "You are an AI email-response generator. Your job is to read the feedback provided by the user and compose a clear, polite, and professional email message.\n\nYour responsibilities:\n\nUnderstand the user’s feedback — identify the sentiment, main points, concerns, issues, or appreciation expressed.\n\nWrite a complete email reply tailored to that feedback.\n\nUse a professional and friendly tone.\n\nAcknowledge the user’s feedback explicitly.\n\nIf feedback is negative, apologize genuinely and offer helpful next steps.\n\nIf feedback is positive, express gratitude and reinforce appreciation.\n\nKeep the email concise but meaningful.\n\nDo NOT include any placeholders or brackets.\n\nDo NOT mention that you are an AI.\n\nAlways format the output as a clean email message with:\n\nSubject\n\nGreeting\n\nBody\n\nClosing & signature (use a neutral signature like “Best regards, Support Team”)\n\nINPUT YOU WILL RECEIVE:\nA short text message containing the user’s feedback.\n\nOUTPUT YOU MUST PRODUCE:\nA professionally written email response addressing that specific feedback."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -272,
+        0
+      ],
+      "id": "28c4c19f-6fc3-4ea6-b1b5-42761836f1a7",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        208
+      ],
+      "id": "20dcf2da-e515-45f5-9780-df6c378f919d",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "UqCtQ3P4M93Pdhzd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets Trigger').item.json['Email id'] }}",
+        "subject": "Response to your Feedback",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        80,
+        0
+      ],
+      "id": "26556c1c-d384-4dd4-bf50-b664019d503a",
+      "name": "Send a message",
+      "webhookId": "e004115c-767a-44a4-a3ae-62de4bf5aba1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XMsFxXZa8YCqMi2k",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c74922d9-a154-4bde-904d-1ccf1933630d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "af1a4cd5f4c73301d74c17209f15b1f160131fbf9b2ee2ef9e568ea2da1cbca7"
+  },
+  "id": "ZqHGJhrR9gvvsJue",
+  "tags": []
+}

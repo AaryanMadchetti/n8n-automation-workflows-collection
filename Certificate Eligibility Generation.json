@@ -1,0 +1,439 @@
+{
+  "name": "Certificate Eligibility Generation",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {}
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1A1jBgdMPHrGhIKIqjB-NQ9Xio64ilLyw7VP3QUzPwOA",
+          "mode": "list",
+          "cachedResultName": "Student Info and Marks (Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1A1jBgdMPHrGhIKIqjB-NQ9Xio64ilLyw7VP3QUzPwOA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1601421632,
+          "mode": "list",
+          "cachedResultName": "Form responses 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1A1jBgdMPHrGhIKIqjB-NQ9Xio64ilLyw7VP3QUzPwOA/edit#gid=1601421632"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -496,
+        0
+      ],
+      "id": "e466bb1a-c8ec-4b5f-a9e9-73612091e13e",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "IsN4EGWWSidpqPHq",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "08d3a5bc-aadc-4e14-bea6-4e2b2faf8161",
+              "leftValue": "={{ $json['Project Presentation Completed'] }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "373578a3-9663-4e29-97e1-cc74c350cfdf",
+              "leftValue": "={{ $json['Total Task Completed(out of 10)'] }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "cbbdf572-59b8-41c9-9531-06e33f435777",
+              "leftValue": "={{ $json['Total Assignment Completed(out of 10)'] }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -288,
+        0
+      ],
+      "id": "59dd92e4-8443-41de-8c45-3edbb4b0bf45",
+      "name": "Check Certificate Eligibility"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets Trigger').item.json['Mail ID'] }}",
+        "subject": "Update on Your Certificate Eligibility",
+        "message": "=Hello {{ $('Google Sheets Trigger').item.json.Name }},   Thank you for your participation.   Currently, you are **not eligible** for a certificate.   To qualify, complete all tasks, assignments, and quizzes,   and improve your marks based on the given criteria.   You’ve got this — keep trying! 💫 ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -80,
+        96
+      ],
+      "id": "13202ae5-8243-45c4-8890-5442df0d75a2",
+      "name": "Not Eligible Email",
+      "webhookId": "a0900f65-c898-4d9b-9953-c8bd19755419",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XMsFxXZa8YCqMi2k",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "152d176e-75f2-469e-bf65-ddfb3f0f748d",
+              "leftValue": "={{ $json['Monthly Assessment Marks(out of 100)'] }}",
+              "rightValue": 40,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e3d0ffe5-92de-4ec8-8f32-10d14675c611",
+              "leftValue": "={{ $json['Monthly Assessment Marks(out of 100)'] }}",
+              "rightValue": 60,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            },
+            {
+              "id": "60a556d1-847b-4c04-8450-240f0e21eaa8",
+              "leftValue": "={{ $json['Quiz Marks(out of 100)'] }}",
+              "rightValue": 40,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "da438881-7658-47f1-838a-6cc83fd3339f",
+              "leftValue": "={{ $json['Quiz Marks(out of 100)'] }}",
+              "rightValue": 60,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -80,
+        -96
+      ],
+      "id": "844f7e0b-7770-4de3-b0a0-339e1a81fdd9",
+      "name": "Check For Bronze"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d7a4d2f5-f4e3-4c3b-8e64-89df8de49403",
+              "leftValue": "={{ $json['Monthly Assessment Marks(out of 100)'] }}",
+              "rightValue": 60,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e2eb4c41-1cb2-44ec-964e-dc4478dc890c",
+              "leftValue": "={{ $json['Monthly Assessment Marks(out of 100)'] }}",
+              "rightValue": 80,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            },
+            {
+              "id": "b191f61c-7b9b-4bf7-ba46-af09ef9fd814",
+              "leftValue": "={{ $json['Quiz Marks(out of 100)'] }}",
+              "rightValue": 60,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "5e30a789-6119-4931-9a6e-74d87c421160",
+              "leftValue": "={{ $json['Quiz Marks(out of 100)'] }}",
+              "rightValue": 80,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        128,
+        0
+      ],
+      "id": "4b995f8a-90b7-4a51-a3a3-68e197a864b0",
+      "name": "Check For Silver"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets Trigger').item.json['Mail ID'] }}",
+        "subject": "Good Job! You’ve Earned the Silver Certificate",
+        "message": "=Hello {{ $('Google Sheets Trigger').item.json.Name }},  \nGreat effort! Based on your results,  \nyou are eligible for the **Silver Certificate**.  \nKeep pushing forward — Gold is just one step away! 🏅 ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        336,
+        -32
+      ],
+      "id": "ec03d50e-a0e0-4846-95ee-ff90253d2042",
+      "name": "Silver Certificate Email",
+      "webhookId": "2e704f57-435a-48fe-8e44-c71385d804ec",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XMsFxXZa8YCqMi2k",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets Trigger').item.json['Mail ID'] }}",
+        "subject": "You’re Eligible for the Bronze Certificate",
+        "message": "=Hello {{ $('Google Sheets Trigger').item.json.Name }},   Well done! You’ve qualified for the **Bronze Certificate**.   Keep practicing and improving to reach Silver or Gold levels next time! 💪",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        128,
+        -192
+      ],
+      "id": "f7d61b41-e668-4b98-9375-3dc3177b9354",
+      "name": "Bronze Certificate Email",
+      "webhookId": "2e704f57-435a-48fe-8e44-c71385d804ec",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XMsFxXZa8YCqMi2k",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e164f77f-5baf-42c9-b68a-0c8a7b8acb22",
+              "leftValue": "={{ $json['Monthly Assessment Marks(out of 100)'] }}",
+              "rightValue": 80,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "c599ad30-f8bc-4d80-9cc7-7fb63c53b3f7",
+              "leftValue": "={{ $json['Quiz Marks(out of 100)'] }}",
+              "rightValue": 80,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        336,
+        96
+      ],
+      "id": "64c7901c-887b-49f5-94d2-abaacab24648",
+      "name": "Check For Gold"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets Trigger').item.json['Mail ID'] }}",
+        "subject": "🎉 Congratulations! You’re Eligible for the Gold Certificate",
+        "message": "=Hello {{ $json.Name }},  \nCongratulations! Based on your outstanding performance,  \nyou are eligible for the **Gold Certificate**.  \nKeep up the great work and continue shining! ✨",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        560,
+        48
+      ],
+      "id": "ff7c57c2-822f-4fad-9048-e02122e4a00a",
+      "name": "Gold Certificate Email",
+      "webhookId": "2e704f57-435a-48fe-8e44-c71385d804ec",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XMsFxXZa8YCqMi2k",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check Certificate Eligibility",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Certificate Eligibility": {
+      "main": [
+        [
+          {
+            "node": "Check For Bronze",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Not Eligible Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check For Bronze": {
+      "main": [
+        [
+          {
+            "node": "Bronze Certificate Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check For Silver",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check For Silver": {
+      "main": [
+        [
+          {
+            "node": "Silver Certificate Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check For Gold",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check For Gold": {
+      "main": [
+        [
+          {
+            "node": "Gold Certificate Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "77c5dc2a-baa0-4d9e-bab0-4940c2ba1323",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "af1a4cd5f4c73301d74c17209f15b1f160131fbf9b2ee2ef9e568ea2da1cbca7"
+  },
+  "id": "2gfDvRZEXhjwhSyJ",
+  "tags": []
+}

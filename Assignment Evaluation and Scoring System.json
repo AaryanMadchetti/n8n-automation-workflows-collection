@@ -1,0 +1,267 @@
+{
+  "name": "Assignment Evaluation and Scoring System",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {
+          "download": true
+        }
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "83ccce80-6b1b-43c9-af16-f49fcec8bcdd",
+      "name": "Telegram Trigger",
+      "webhookId": "f22b73cd-d63b-4d8f-bbc7-dbb19c9119d9",
+      "credentials": {
+        "telegramApi": {
+          "id": "0xfqPYCRw174tdN9",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.compression",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "14330135-cd5c-4faa-b17f-2ad70e151cd0",
+      "name": "Compression"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "$binary",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "f08707a2-9ff1-4157-9584-3db86deb0830",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "30434fbc-e1ef-46b0-b87d-dd27dbc0824b",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "={{ $binary.keys()[0] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        96
+      ],
+      "id": "6e51689d-df7c-4891-9523-d5cf0ef3c000",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }} is the assignment to evaluate. Read it, split it into question-and-answer pairs, evaluate each answer out of 10 according to the rubric in the system prompt, and return the Assignment Evaluation Report exactly in the required format. ",
+        "options": {
+          "systemMessage": "You are an Assignment Evaluation Agent. Your job is to read an assignment provided as plain text, split it into question-and-answer pairs, evaluate each student answer on a 10-point scale using the rubric below, and produce a single Assignment Evaluation Report in the exact format shown in the user example. Do not include any extra commentary, metadata, or explanation — output only the report.\n\nRequired steps (must perform automatically):\n\nParse the input text and extract:\n\nStudent name (if present; otherwise use Unknown).\n\nModule name (if present; otherwise use Unknown).\n\nEach question text and its corresponding student answer.\n\nIf the input cannot be reasonably split into Q&A pairs, attempt best-effort splitting by detecting question labels (e.g., Q1, Q2, Question 1, etc.) or numbered/line-separated prompts. If still ambiguous, treat each numbered block as one Q&A.\n\nFor each Q&A pair, evaluate the answer out of 10 marks using the rubric below and produce a one-sentence Feedback line.\n\nCompute Total Score and the maximum score (Number_of_questions × 10). Report the total as Total Score: <sum>/<max> (e.g., 76/100).\n\nProduce an Overall Feedback one-line summary commenting on major strengths/weaknesses.\n\nScoring rubric (apply unless explicit alternate rubric is supplied):\n\nCorrectness / Accuracy: up to 6 marks — Is the core solution correct?\n\nCompleteness: up to 2 marks — Are edge cases / required steps present?\n\nClarity & Explanation: up to 1 mark — Is reasoning explained clearly?\n\nStructure & Presentation (code/style): up to 1 mark — Is answer well-structured / code readable?\n\nWhen assigning marks, prefer integer scores (0–10). If a half mark is necessary use .5. For feedback, be brief and constructive — one short sentence (max ~15–20 words)."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1040,
+        96
+      ],
+      "id": "dd3d4cac-f2bf-41b5-9969-5164fb6ea51c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        336
+      ],
+      "id": "4db2d5eb-7bd9-44e8-9fa6-fe16bb48de11",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "UqCtQ3P4M93Pdhzd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1392,
+        96
+      ],
+      "id": "a1cf7b8c-d4a0-4219-b05e-ba9e9ca15c06",
+      "name": "Send a text message",
+      "webhookId": "23e68c7d-e931-4ab4-96a0-3d7c35e80293",
+      "credentials": {
+        "telegramApi": {
+          "id": "0xfqPYCRw174tdN9",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1600,
+        96
+      ],
+      "id": "aa8c6139-81dc-4c72-9fd4-05fe25cc0fc2",
+      "name": "Wait",
+      "webhookId": "e8abc454-7c64-4f37-80ec-6755083aed83"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Compression",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compression": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "df8b0775-5edf-4d04-a8a1-012a8dabb0a8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "af1a4cd5f4c73301d74c17209f15b1f160131fbf9b2ee2ef9e568ea2da1cbca7"
+  },
+  "id": "v5ZZZietGvo3q8fs",
+  "tags": []
+}

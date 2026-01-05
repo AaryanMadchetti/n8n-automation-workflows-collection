@@ -1,0 +1,382 @@
+{
+  "name": "Monthly Assessment Marks Calculation",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Assessment Marks Calculation",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name"
+            },
+            {
+              "fieldLabel": "Subscribed for which course?",
+              "fieldType": "radio",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Data Analysis"
+                  },
+                  {
+                    "option": "Data Science"
+                  }
+                ]
+              },
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -464,
+        -16
+      ],
+      "id": "e4a3fbc1-aae2-45b7-a6be-74625ef6d0f5",
+      "name": "On form submission",
+      "webhookId": "d31b1f7b-0395-4d24-b995-e9e6027ee824"
+    },
+    {
+      "parameters": {
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Enter your marks for Python",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Enter your marks for EDA",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Enter your marks for SQL",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Enter your marks for Power Bi",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Enter your marks for Advance Statistics",
+              "fieldType": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.3,
+      "position": [
+        48,
+        -96
+      ],
+      "id": "d0d37d44-f596-4781-92fc-630a6e758478",
+      "name": "Form",
+      "webhookId": "6c99f292-ce9c-4151-930f-ac5dd4122705"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json['Subscribed for which course?'] }}",
+                    "rightValue": "Data Analysis",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "92aeddaa-0aa3-450d-a334-5aee5d7e5d24"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "DA Form"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "cb45eb1b-0961-4dfc-801b-b5803a1b7554",
+                    "leftValue": "={{ $json['Subscribed for which course?'] }}",
+                    "rightValue": "Data Science",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "DS Form"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -256,
+        -16
+      ],
+      "id": "c10d619a-947f-45bb-b663-6c15d1106128",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Enter your marks for ML",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Enter your marks for ANN",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Enter your marks for CNN",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Enter your marks for NLP",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Enter your marks for Gen AI",
+              "fieldType": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.3,
+      "position": [
+        48,
+        80
+      ],
+      "id": "52824ff9-4d93-4e00-acb4-afdb81f91ed6",
+      "name": "Form2",
+      "webhookId": "6c99f292-ce9c-4151-930f-ac5dd4122705"
+    },
+    {
+      "parameters": {
+        "language": "pythonNative",
+        "pythonCode": "avg = (\n    _items[0][\"json\"]['Enter your marks for Python']\n    + _items[0][\"json\"]['Enter your marks for EDA']\n    + _items[0][\"json\"]['Enter your marks for SQL']\n    + _items[0][\"json\"]['Enter your marks for Power Bi']\n    + _items[0][\"json\"]['Enter your marks for Advance Statistics']\n) / 5\n\nreturn {\"avg\": avg}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        256,
+        -96
+      ],
+      "id": "2ea2de11-0404-46d3-b00b-e7f9b0953b03",
+      "name": "Code in Python (Native) (Beta)"
+    },
+    {
+      "parameters": {
+        "language": "pythonNative",
+        "pythonCode": "avg = (\n    _items[0][\"json\"]['Enter your marks for ML']\n    + _items[0][\"json\"]['Enter your marks for ANN']\n    + _items[0][\"json\"]['Enter your marks for CNN']\n    + _items[0][\"json\"]['Enter your marks for NLP']\n    + _items[0][\"json\"]['Enter your marks for Gen AI']\n) / 5\n\nreturn {\"avg\": avg}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        256,
+        80
+      ],
+      "id": "71022ffd-13da-4a82-8801-afb6a2879c0f",
+      "name": "Code in Python (Native) (Beta)1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b97642eb-f9d8-4feb-bd0e-b952ecb78d08",
+              "leftValue": null,
+              "rightValue": 70,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        -16
+      ],
+      "id": "e795492b-24ef-4055-8c6d-ed0ec7630b02",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "RESULT",
+        "completionMessage": "🎉 Congratulations! You are eligible for the placement drive.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.3,
+      "position": [
+        736,
+        -112
+      ],
+      "id": "1112a2b9-5ed1-4992-bde6-6b2c72d597fa",
+      "name": "Form1",
+      "webhookId": "b953b3a0-21a6-4b8c-8e92-4a226c3aa356"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "RESULT",
+        "completionMessage": "⚠️ You are not eligible. Please focus on modules with lower marks.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.3,
+      "position": [
+        752,
+        64
+      ],
+      "id": "2d99e3a3-6aed-4819-b881-d7281b13c8d8",
+      "name": "Form3",
+      "webhookId": "b953b3a0-21a6-4b8c-8e92-4a226c3aa356"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Form2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Form": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Native) (Beta)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Form2": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Native) (Beta)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Native) (Beta)1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Native) (Beta)": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Form1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Form3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "68e90983-f81a-4a64-842a-384b3888158b",
+  "meta": {
+    "instanceId": "af1a4cd5f4c73301d74c17209f15b1f160131fbf9b2ee2ef9e568ea2da1cbca7"
+  },
+  "id": "aAOF2iJjQZ7rBhkB",
+  "tags": []
+}
